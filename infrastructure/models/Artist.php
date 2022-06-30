@@ -1,5 +1,5 @@
 <?php
-    class Artist extends Database implements IArticles
+    class Artist extends Database implements IArtist, IArtistTitle
     {
         public function GetAllArtists()
         {
@@ -13,7 +13,14 @@
 
         public function UpdateArtist(int $id, array $keyValuePairs)
         {
-
+            $querySets = "";
+            foreach ($keyValuePairs as $key => $value) {
+                $querySets .= "$key='$value',";
+            }
+            $querySets[strlen($querySets) - 1] = " ";
+            $querySets = trim($querySets);
+            $query = "UPDATE Künstler SET $querySets WHERE Id = $id";
+            return $this->Update($query);
         }
 
         public function AddArtist(array $args)
@@ -32,9 +39,14 @@
             return $this->Add($query, array(":Col" => "Künstler"));
         }
 
-        public function DeleteArtist(int $id)
+        public function DeleteArtistById(int $id)
         {
-            # code...
+            return $this->Delete("DELETE FROM Künstler WHERE Id = $id");
+        }
+
+        public function DeleteArtistByName(int $name)
+        {
+            return $this->Delete("DELETE FROM Künstler WHERE [Name] = $name");
         }
         
         public function GetCurrentId()

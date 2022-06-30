@@ -17,6 +17,9 @@ class TestController extends BaseController
 
 
                 // $result = $testArtist -> AddArtist($arrQueryStringParams);
+                // $id = $arrQueryStringParams["Id"];
+                // unset($arrQueryStringParams["Id"]);
+                // $testArtist->UpdateArtist($id, $arrQueryStringParams);
                 $arrArtists = $testModel->getAllArtists();
                 $responseData = json_encode($arrArtists);
             } catch (Error $e) {
