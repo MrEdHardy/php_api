@@ -14,14 +14,9 @@ class TestController extends BaseController
             try {
                 $testModel = new TestModel();
                 $testArtist = new Artist();
- 
-                // $intLimit = 10;
-                // if (isset($arrQueryStringParams['limit']) && $arrQueryStringParams['limit']) {
-                //     $intLimit = $arrQueryStringParams['limit'];
-                // 
-                
 
-                $result = $testArtist -> AddArtist($arrQueryStringParams);
+
+                // $result = $testArtist -> AddArtist($arrQueryStringParams);
                 $arrArtists = $testModel->getAllArtists();
                 $responseData = json_encode($arrArtists);
             } catch (Error $e) {
