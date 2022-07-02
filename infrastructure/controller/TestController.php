@@ -2,7 +2,7 @@
 class TestController extends BaseController
 {
     /**
-     * "/test/list" Endpoint - Get list of users
+     * "/test/list" Endpoint - Get list of Artist
      */
     public function listAction()
     {
@@ -20,6 +20,8 @@ class TestController extends BaseController
                 // $id = $arrQueryStringParams["Id"];
                 // unset($arrQueryStringParams["Id"]);
                 // $testArtist->UpdateArtist($id, $arrQueryStringParams);
+                // $test = $testArtist->GetArtistsByTitleName($arrQueryStringParams["Name"]);
+                // $test = $testArtist -> AddNewTitleCollectionEntry($arrQueryStringParams["TitleId"], $arrQueryStringParams["ArtistId"]);
                 $arrArtists = $testModel->getAllArtists();
                 $responseData = json_encode($arrArtists);
             } catch (Error $e) {

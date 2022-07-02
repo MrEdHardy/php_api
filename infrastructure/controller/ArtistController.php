@@ -1,7 +1,7 @@
-<?
+<?php
     class ArtistController extends BaseController 
     {
-        public function GetAllArtistAction()
+        public function GetAllArtistsAction()
         {
             # code...
         }
@@ -11,3 +11,4 @@
             # code...
         }
     }
+?>

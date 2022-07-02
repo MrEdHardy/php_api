@@ -1,10 +1,7 @@
 <?php
     interface IArtist {
-        public function GetAllArtists();
-        public function GetArtistsById(int $id);
-        public function UpdateArtist(int $id, array $keyValuePairs);
-        public function AddArtist(array $keyValuePairs);
-        public function DeleteArtistById(int $id);
-        public function GetCurrentId();
+        public function GetArtistsByTitleId(int $id);
+        public function GetArtistsByTitleName(string $name);
+        public function DeleteArtistByName(int $name);
     }
 ?>

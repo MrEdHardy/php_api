@@ -26,10 +26,10 @@ class DataBase
             $stmt = $this->ExecuteStatement($query, $params);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             // $connection = null;
-
+            $this->connection->commit();
             return $result;
-        } catch (PDOException $e) {
-            throw new PDOException($e->getMessage());
+        } catch (Exception $e) {
+            throw $e;
         }
         return false;
     }
@@ -37,10 +37,10 @@ class DataBase
     public function Add($query = "", $params = [])
     {
         try {
-            $this->ExecuteStatement($query, null);
-            // $result = $stmt->fetch(PDO::FETCH_COLUMN);
-            // $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $result = $this->GetCurrentMaxId($params[":Col"]);
+            $this->ExecuteStatement($query, $params);
+            // $result = $this->GetCurrentMaxId($params[":Col"]);
+            $result = $this->connection->lastInsertId();
+            $this->connection->commit();
             return $result;
         } catch (Exception $e) {
             throw $e;
@@ -52,6 +52,7 @@ class DataBase
     {
         try {
             $this->ExecuteStatement($query, $params);
+            $this->connection->commit();
             return true;
         } catch (Exception $e) {
             throw $e;
@@ -74,7 +75,7 @@ class DataBase
             $stmt = $this->connection->prepare($query);
 
             if ($stmt === false) {
-                throw new PDOException("Unable to do prepared statement: " . $query);
+                throw new PDOException("Unable to prepare statement: " . $query);
             }
 
             if ($params) {
@@ -83,10 +84,12 @@ class DataBase
                 }
             }
 
+            $this->connection->beginTransaction();
             $stmt->execute();
 
             return $stmt;
         } catch (PDOException $e) {
+            $this->connection->rollBack();
             throw new PDOException($e->getMessage());
         }
     }
@@ -96,6 +99,7 @@ class DataBase
         try {
             $stmt = $this->ExecuteStatement("SELECT MAX(Id) AS 'Identity' FROM $column", null);
             return $stmt->fetch(PDO::FETCH_COLUMN);
+            // return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw $e;
         }
