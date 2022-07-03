@@ -1,5 +1,6 @@
 <?php
-    interface IArtist {
+    interface IArtist 
+    {
         public function GetArtistsByTitleId(int $id);
         public function GetArtistsByTitleName(string $name);
         public function DeleteArtistByName(int $name);

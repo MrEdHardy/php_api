@@ -15,8 +15,8 @@ class DataBase
         $dsn = str_replace(":DB", $this->database, $dsn);
         try {
             $this->connection = new PDO("sqlsrv:$dsn", $this->username, $this->password);
-        } catch (PDOException $e) {
-            throw new PDOException($e->getMessage());
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 
@@ -88,19 +88,19 @@ class DataBase
             $stmt->execute();
 
             return $stmt;
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $this->connection->rollBack();
-            throw new PDOException($e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 
     public function GetCurrentMaxId($column)
     {
         try {
-            $stmt = $this->ExecuteStatement("SELECT MAX(Id) AS 'Identity' FROM $column", null);
+            $stmt = $this->ExecuteStatement("SELECT MAX(Id) AS 'Identity' FROM $column");
             return $stmt->fetch(PDO::FETCH_COLUMN);
             // return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             throw $e;
         }
         return false;

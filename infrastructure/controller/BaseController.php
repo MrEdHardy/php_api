@@ -10,6 +10,8 @@ class BaseController
     }
  
     /**
+     * @deprecated not used anymore, due for removal
+     * 
      * Get URI elements.
      * 
      * @return array
@@ -43,7 +45,7 @@ class BaseController
      * @param mixed  $data
      * @param string $httpHeader
      */
-    protected function sendOutput($data, $httpHeaders=array())
+    private function sendOutput($data, $httpHeaders=array())
     {
         header_remove('Set-Cookie');
  
@@ -55,5 +57,34 @@ class BaseController
  
         echo $data;
         exit;
+    }
+
+    protected function prepareOutput(array $errorEntity, $responseData)
+    {
+        if (!$errorEntity["errorCode"]) {
+            $this->sendOutput(
+                $responseData,
+                array('Content-Type: application/json', 'HTTP/1.1 200 OK')
+            );
+        } else {
+            $this->sendOutput(json_encode(array('error' => $errorEntity["errorCode"])), 
+                array('Content-Type: application/json', $errorEntity["errorHeader"])
+            );
+        }
+    }
+
+    /**
+     * @return array with Error Descriptions if server method isn't the desired method; otherwise array with empty elements
+     */
+    protected function checkServerMethod(string $expected) : array
+    {
+        $errDesc = "";
+        $errHeader = "";
+        if(strcasecmp($_SERVER["REQUEST_METHOD"], $expected) != 0)
+        {
+            $errDesc = "Error 422: Method not supported";
+            $errHeader = "HTTP/1.1 422 Unprocessable Entity";
+        }
+        return array("errorCode" => $errDesc, "errorHeader" => $errHeader);
     }
 }

@@ -1,5 +1,6 @@
 <?php
-    interface IEntity {
+    interface IEntity 
+    {
         public function GetAllEntities();
         public function GetEntityById(int $id);
         public function UpdateEntity(int $id, array $keyValuePairs);

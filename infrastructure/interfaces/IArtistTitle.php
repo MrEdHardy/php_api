@@ -1,9 +1,6 @@
 <?php 
-    interface IArtistTitle {
-        // public function GetArtistsByTitleId(int $id);
-        // public function GetArtistsByTitleName(string $name);
-        // public function GetTitleByArticleId(int $id);
-        // public function GetTitleByArticleName(string $name);
+    interface IArtistTitle 
+    {
         // Achtung UNIQUE Index bei TitleCollection für TitelId und KünstlerId!!!
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId);
         public function GetTitleCollectionIdByArtistNameAndTitleName(string $titleName, string $artistName);
