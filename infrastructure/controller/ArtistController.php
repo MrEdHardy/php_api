@@ -61,7 +61,35 @@
                 }
             $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
         }
-
+        
+        /**
+         * Endpoint ../artists/getArtistById
+         */
+        public function AddArtistAction()
+        {
+            $errors = $this->checkServerMethod("POST");
+            $this->strErrorDesc = $errors["errorCode"];
+            $this->strErrorHeader = $errors["errorHeader"];
+            try 
+            {
+                $body = $this->GetJsonFromRequestBody() ?? throw new Error("No JSON to add was given!");
+                $result = $this->artistModel->AddEntity($body);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->strErrorDesc = " Bad Request!";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = "HTTP/1.1 400 Bad Request";
+            }
+            catch(Exception $e)
+            {
+                // catch errors caused by model
+                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+            }
+            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+        }
         // more Actions to come ...
     }
 ?>

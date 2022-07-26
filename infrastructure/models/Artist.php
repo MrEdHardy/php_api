@@ -27,7 +27,10 @@
         {
             $queryColumns = "";
             $queryValues = "";
-            foreach ($args as $key => $value) {
+            if(count($args) <= 0)
+                throw new Exception("JSON is empty!");
+            foreach ($args as $key => $value) 
+            {
                 $queryColumns .= "$key,";
                 $queryValues .= "'$value',";
             }
@@ -37,7 +40,7 @@
             $queryValues = trim($queryValues);
             $query = "INSERT INTO Künstler($queryColumns) VALUES($queryValues)";
             // return $this->Add($query, array(":Col" => "Künstler"));
-            return $this->Add($query);
+            return array("Id" => $this->Add($query));
         }
 
         public function DeleteEntity(int $id)
