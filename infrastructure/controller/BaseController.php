@@ -87,4 +87,21 @@ class BaseController
         }
         return array("errorCode" => $errDesc, "errorHeader" => $errHeader);
     }
+
+    /**
+     * Will try to parse JSON Body to associative array
+     * @return array|null will return associative array or null
+     */
+    protected function GetJsonFromRequestBody() : array | null
+    {
+        $request_body = file_get_contents("php://input");
+        $jsonObject = json_decode($request_body);
+        if($jsonObject === null)
+            return $jsonObject;
+
+        $data = array();
+        foreach ($jsonObject as $key => $value) 
+            $data[$key] = $value;
+        return $data;
+    }
 }
