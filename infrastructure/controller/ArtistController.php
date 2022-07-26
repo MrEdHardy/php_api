@@ -63,7 +63,7 @@
         }
         
         /**
-         * Endpoint ../artists/getArtistById
+         * Endpoint ../artists/addArtist
          */
         public function AddArtistAction()
         {
