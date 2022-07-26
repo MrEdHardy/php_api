@@ -82,8 +82,8 @@ class BaseController
         $errHeader = "";
         if(strcasecmp($_SERVER["REQUEST_METHOD"], $expected) != 0)
         {
-            $errDesc = "Error 422: Method not supported";
-            $errHeader = "HTTP/1.1 422 Unprocessable Entity";
+            $errDesc = "Method not supported";
+            $errHeader = "HTTP/1.1 405 Method Not Allowed";
         }
         return array("errorCode" => $errDesc, "errorHeader" => $errHeader);
     }
