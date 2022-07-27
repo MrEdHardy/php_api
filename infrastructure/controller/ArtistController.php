@@ -70,19 +70,22 @@
          */
         public function AddArtistAction()
         {
-            $errors = $this->checkServerMethod("POST");
-            $this->strErrorDesc = $errors["errorCode"];
-            $this->strErrorHeader = $errors["errorHeader"];
             try 
             {
-                $body = $this->GetJsonFromRequestBody() ?? throw new Error("No JSON to add was given!");
-                $result = $this->artistModel->AddEntity($body);
+                $errors = $this->checkServerMethod("POST");
+                $this->strErrorDesc = $errors["errorCode"];
+                $this->strErrorHeader = $errors["errorHeader"];
+                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
+                    throw new Error("Method Not Allowed!");
+                if(count($this->requestJsonBody) <= 0)
+                    throw new Error("No valid JSON was given!");
+                $result = $this->artistModel->AddEntity($this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
-                $this->strErrorDesc = " Bad Request!";
+                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
                 $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/1.1 400 Bad Request";
+                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
             }
             catch (Exception $e)
             {
