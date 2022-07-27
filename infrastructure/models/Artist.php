@@ -11,16 +11,19 @@
             return $this->select("SELECT * FROM Künstler WHERE Id = :Id", array(":Id" => $id));
         }
 
-        public function UpdateEntity(int $id, array $keyValuePairs)
+        public function UpdateEntity(int $id, array $args)
         {
             $querySets = "";
-            foreach ($keyValuePairs as $key => $value) {
+            if(count($args) <= 0)
+                throw new Exception("JSON is empty!");
+            foreach ($args as $key => $value) 
+            {
                 $querySets .= "$key='$value',";
             }
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);
             $query = "UPDATE Künstler SET $querySets WHERE Id = $id";
-            return $this->Update($query);
+            return array("successful" => $this->Update($query));
         }
 
         public function AddEntity(array $args)
