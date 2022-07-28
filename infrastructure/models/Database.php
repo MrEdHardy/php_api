@@ -75,18 +75,10 @@ class DataBase
         try {
             $stmt = $this->connection->prepare($query);
 
-            if ($stmt === false) {
+            if ($stmt === false) 
                 throw new PDOException("Unable to prepare statement: " . $query);
-            }
-
-            if ($params) {
-                foreach ($params as $key => $value) {
-                    $stmt->bindParam($key, $value);
-                }
-            }
-
             $this->connection->beginTransaction();
-            $stmt->execute();
+            $stmt->execute($params);
 
             return $stmt;
         } catch (Exception $e) {

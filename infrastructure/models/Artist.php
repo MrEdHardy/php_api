@@ -81,7 +81,7 @@
         {
             return $this->Select("SELECT tc.Id FROM Künstler as k
             INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
-            INNER JOIN Titel t ON t.Id = tc.Id
+            INNER JOIN Titel t ON t.Id = tc.TitelId
             WHERE k.Id = :KId AND t.Id = :TId", array(":KId" => $artistId, ":TId" => $titleId));
         }
 
@@ -89,8 +89,8 @@
         {
             return $this->Select("SELECT tc.Id FROM Künstler as k
             INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
-            INNER JOIN Titel t ON t.Id = tc.Id
-            WHERE k.Name = :KName AND t.Name = :TName", array(":KName" => $artistName, ":TName" => $titleName));
+            INNER JOIN Titel t ON t.Id = tc.TitelId
+            WHERE k.[Name] = :KName AND t.[Name] = :TName", array(":KName" => $artistName, ":TName" => $titleName));
         }
 
         public function AddNewTitleCollectionEntry(int $titleId, int $artistId)
