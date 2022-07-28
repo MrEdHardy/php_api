@@ -209,6 +209,51 @@
             }
             $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
         }
+
+        /**
+         * Endpoint ../artists/gettitlecollectionIdsbyartistandtitle
+         */
+        public function GetTitleCollectionIdsByArtistAndTitleAction()
+        {
+            try 
+            {
+                $errors = $this->checkServerMethod("GET");
+                $this->strErrorDesc = $errors["errorCode"];
+                $this->strErrorHeader = $errors["errorHeader"];
+                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
+                    throw new Error("Method Not Allowed!");
+                if(count($this->requestJsonBody) <= 0)
+                    throw new Error("No valid JSON was given!");
+                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $result = $this->artistModel
+                    ->GetTitleCollectionIdByArtistIdAndTitleId($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
+                }
+                elseif(isset($this->requestJsonBody["TitleName"]) && isset($this->requestJsonBody["ArtistName"]))
+                {
+                    $result = $this->artistModel
+                    ->GetTitleCollectionIdByArtistNameAndTitleName($this->requestJsonBody["TitleName"], $this->requestJsonBody["ArtistName"]);
+                }
+                else
+                {
+                    throw new Error("JSONs cannot have mixed Attributes!");
+                }
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+            }
+            catch (Exception $e)
+            {
+                // catch errors caused by model
+                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+            }
+            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+        }
         // more Actions to come ...
     }
 ?>
