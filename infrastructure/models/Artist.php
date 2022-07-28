@@ -51,9 +51,9 @@
             return $this->Delete("DELETE FROM Künstler WHERE Id = $id");
         }
 
-        public function DeleteArtistByName(int $name)
+        public function DeleteArtistByName(string $name)
         {
-            return $this->Delete("DELETE FROM Künstler WHERE [Name] = $name");
+            return $this->Delete("DELETE FROM Künstler WHERE [Name] = '$name'");
         }
         
         public function GetCurrentId()

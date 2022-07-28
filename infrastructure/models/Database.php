@@ -64,6 +64,7 @@ class DataBase
     {
         try {
             $this->ExecuteStatement($query, $params);
+            $this->connection->commit();
         } catch (Exception $e) {
             throw $e;
         }
