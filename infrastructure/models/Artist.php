@@ -66,7 +66,7 @@
             return $this->Select("SELECT k.* FROM Künstler as k
             INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
             INNER JOIN Titel t ON t.Id = tc.Id
-            WHERE k.Id = :Id", array(":Id" => $id));
+            WHERE t.Id = :Id", array(":Id" => $id));
         }
 
         public function GetArtistsByTitleName(string $name)
@@ -74,7 +74,7 @@
             return $this->Select("SELECT k.* FROM Künstler as k
             INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
             INNER JOIN Titel t ON t.Id = tc.Id
-            WHERE k.Name = :Name", array(":Name" => $name));
+            WHERE t.Name = :Name", array(":Name" => $name));
         }
         
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId)
