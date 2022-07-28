@@ -95,7 +95,7 @@
 
         public function AddNewTitleCollectionEntry(int $titleId, int $artistId)
         {
-            return $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId));
+            return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId)));
         }
 
         public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId)
