@@ -170,6 +170,45 @@
             }
             $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
         }
+
+        /**
+         * Endpoint ../artists/getartistbytitle
+         */
+        public function GetArtistByTitleAction()
+        {
+            try 
+            {
+                $errors = $this->checkServerMethod("GET");
+                $this->strErrorDesc = $errors["errorCode"];
+                $this->strErrorHeader = $errors["errorHeader"];
+                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
+                    throw new Error("Method Not Allowed!");
+                if(!isset($this->queryArgsArray["Id"]) && !isset($this->queryArgsArray["Name"]))
+                    throw new Error("Nothing to look for was specified!");
+                if (isset($this->queryArgsArray["Id"])) 
+                {
+                    $result = $this->artistModel->GetArtistsByTitleId($this->queryArgsArray["Id"]);
+                } 
+                else 
+                {
+                    $result = $this->artistModel->GetArtistsByTitleName($this->queryArgsArray["Name"]);
+                }
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+               // catch Error caused by the controller
+               $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
+               $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+               $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+            }
+            catch (Exception $e)
+            {
+                // catch errors caused by model
+                $this->strErrorDesc = " Operation failed! Please check Params!";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+            }
+            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+        }
         // more Actions to come ...
     }
 ?>
