@@ -106,12 +106,12 @@
 
         public function DeleteTitleCollectionEntryById(int $id)
         {
-            return $this->Delete("DELETE FROM Künstlercollection WHERE Id = :Id", array(":Id" => $id));
+            return $this->Delete("DELETE FROM Titelcollection WHERE Id = :Id", array(":Id" => $id));
         }
 
         public function DeleteTitleCollectionEntryByArtistIdAndTitleId(int $titleId, int $artistId)
         {
-            return $this->Delete("DELETE FROM Künstlercollection WHERE TitelId = :TId AND KünstlerId = :KId", 
+            return $this->Delete("DELETE TOP(1) FROM Titelcollection WHERE TitelId = :TId AND KünstlerId = :KId", 
             array(":TId" => $titleId, ":KId" => $artistId));
         }
     }

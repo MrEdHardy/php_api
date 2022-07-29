@@ -336,6 +336,48 @@
             }
             $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
         }
+
+         /**
+         * Endpoint ../artists/deletetitlecollectionentry
+         */
+        public function DeleteTitleCollectionEntryAction()
+        {
+            try 
+            {
+                $errors = $this->checkServerMethod("DELETE");
+                $this->strErrorDesc = $errors["errorCode"];
+                $this->strErrorHeader = $errors["errorHeader"];
+                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
+                    throw new Error("Method Not Allowed!");
+                if(isset($this->queryArgsArray["Id"]))
+                {
+                    $this->artistModel->DeleteTitleCollectionEntryById($this->queryArgsArray["Id"]);
+                }
+                elseif(count($this->requestJsonBody) > 0 && isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $this->artistModel->DeleteTitleCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
+                }
+                else
+                {
+                    throw new Error("Id in Query or JSON with TitleId, ArtistId must be set!");
+                }
+                $result = array("successfull" => true);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+            }
+            catch(Exception $e)
+            {
+                // catch errors caused by model
+                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
+                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
+                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+            }
+            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+        }
         // more Actions to come ...
     }
 ?>
