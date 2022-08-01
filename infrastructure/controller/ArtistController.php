@@ -2,19 +2,11 @@
     class ArtistController extends BaseController 
     {
         private readonly Artist $artistModel;
-        private readonly array $queryArgsArray;
-        private readonly array $requestJsonBody;
-        private $strErrorDesc = "";
-        private $strErrorHeader = "";
-        private $responseData = "";
         
         public function __construct()
         {
             $this->artistModel = new Artist();
-            $query = $this->getQueryStringParams();
-            $this->queryArgsArray = $query ?? array();
-            $body = $this->GetJsonFromRequestBody();
-            $this->requestJsonBody = $body ?? array();
+            parent::__construct();
         }
 
         /**
@@ -22,23 +14,23 @@
          */
         public function GetAllArtistsAction()
         {
-            $errors = $this->checkServerMethod("GET");
-            $this->strErrorDesc = $errors["errorCode"];
-            $this->strErrorHeader = $errors["errorHeader"];
             try 
-                {
-                    // Execute Query
-                    $result = $this->artistModel->GetAllEntities();
-                    // Encode Result to JSON
-                    $this->responseData = json_encode($result);
-
-                } catch (Error $e) {
-                    $this->strErrorDesc = $e->getMessage()."\n Error 500: Something went wrong!";
-                    $this->strErrorHeader = 'HTTP/1.1 500 Internal Server Error';
-                }
+            {
+                $this->validateServerMethod("GET");
+                // Execute Query
+                $result = $this->artistModel->GetAllEntities();
+                // Encode Result to JSON
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                $this->setErrorMsg($e->getMessage(), "Something went wrong", HttpStatusCodesEnum::InternalServerError->value);
+            }
 
             // sends either an error or a result back to the user
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -46,23 +38,22 @@
          */
         public function GetArtistByIdAction()
         {            
-            $errors = $this->checkServerMethod("GET");
-            $this->strErrorDesc = $errors["errorCode"];
-            $this->strErrorHeader = $errors["errorHeader"];
             try 
-                {
-                    // if Id isn't set then throw error
-                    if(!isset($this->queryArgsArray["Id"]))
-                        throw new Error("No Id given!");
-                    $result = $this->artistModel->GetEntityById($this->queryArgsArray["Id"]);
-                    $this->responseData = json_encode($result);
+            {
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::Id);
+                $result = $this->artistModel->GetEntityById($this->queryArgsArray["Id"]);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch errors caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            } 
+            catch (Exception $e) 
+            {
+                $this->setErrorMsg($e->getMessage(), " Something went wrong!", HttpStatusCodesEnum::InternalServerError->value);
+            }
 
-                } catch (Error $e) {
-                    $this->strErrorDesc = !isset($this->queryArgsArray["Id"]) ? " Bad Request!" : " Something went wrong!";
-                    $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                    $this->strErrorHeader = !isset($this->queryArgsArray["Id"]) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 500 Internal Server Error";
-                }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
         
         /**
@@ -72,29 +63,21 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("POST");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(count($this->requestJsonBody) <= 0)
-                    throw new Error("No valid JSON was given!");
+                $this->validateServerMethod("PUT");
+                $this->checkParams(RequiredFieldTypes::JSON);
                 $result = $this->artistModel->AddEntity($this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
-                // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                // catch errors caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -104,31 +87,20 @@
         {
             try 
             {   
-                $errors = $this->checkServerMethod("POST");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(!isset($this->queryArgsArray["Id"]))
-                    throw new Error("No Id given!");
-                if(count($this->requestJsonBody) <= 0)
-                    throw new Error("No valid JSON was given!");
+                $this->validateServerMethod("POST");
+                $this->checkParams(RequiredFieldTypes::IdAndJSON);
                 $result = $this->artistModel->UpdateEntity($this->queryArgsArray["Id"], $this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
-                // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -138,13 +110,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("DELETE");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(!isset($this->queryArgsArray["Id"]) && !isset($this->queryArgsArray["Name"]))
-                    throw new Error("Nothing to delete was specified!");
+                $this->validateServerMethod("DELETE");
+                $this->checkParams(RequiredFieldTypes::IdOrName);
                 if(isset($this->queryArgsArray["Id"]))
                 {
                     $this->artistModel->DeleteEntity($this->queryArgsArray["Id"]);
@@ -153,22 +120,18 @@
                 {
                     $this->artistModel->DeleteArtistByName($this->queryArgsArray["Name"]);    
                 }
-                $result = array("success" => true);
+                $result = array("successful" => true);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
-                // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " Operation failed! Please check Params!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." Operation Failed!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -178,13 +141,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("GET");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(!isset($this->queryArgsArray["Id"]) && !isset($this->queryArgsArray["Name"]))
-                    throw new Error("Nothing to look for was specified!");
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::IdOrName);
                 if (isset($this->queryArgsArray["Id"])) 
                 {
                     $result = $this->artistModel->GetArtistsByTitleId($this->queryArgsArray["Id"]);
@@ -195,19 +153,15 @@
                 }
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
-               // catch Error caused by the controller
-               $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-               $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-               $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " Operation failed! Please check Params!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." Operation Failed!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -217,13 +171,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("GET");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(count($this->requestJsonBody) <= 0)
-                    throw new Error("No valid JSON was given!");
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::JSON);
                 if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
                 {
                     $result = $this->artistModel
@@ -241,18 +190,15 @@
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
         /**
@@ -262,13 +208,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("PUT");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(count($this->requestJsonBody) <= 0)
-                    throw new Error("No valid JSON was given!");
+                $this->validateServerMethod("PUT");
+                $this->checkParams(RequiredFieldTypes::JSON);
                 if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
                 {
                     $result = $this->artistModel
@@ -281,18 +222,15 @@
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
          /**
@@ -302,15 +240,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("POST");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
-                if(!isset($this->queryArgsArray["Id"]))
-                    throw new Error("Id is required!");
-                if(count($this->requestJsonBody) <= 0)
-                    throw new Error("No valid JSON was given!");
+                $this->validateServerMethod("POST");
+                $this->checkParams(RequiredFieldTypes::IdAndJSON);
                 if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
                 {
                     $result = $this->artistModel
@@ -323,18 +254,15 @@
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
 
          /**
@@ -344,11 +272,8 @@
         {
             try 
             {
-                $errors = $this->checkServerMethod("DELETE");
-                $this->strErrorDesc = $errors["errorCode"];
-                $this->strErrorHeader = $errors["errorHeader"];
-                if(!empty($this->strErrorDesc) && !empty($this->strErrorHeader))
-                    throw new Error("Method Not Allowed!");
+                $this->validateServerMethod("DELETE");
+                $this->checkParams(RequiredFieldTypes::IdOrJSON);
                 if(isset($this->queryArgsArray["Id"]))
                 {
                     $this->artistModel->DeleteTitleCollectionEntryById($this->queryArgsArray["Id"]);
@@ -361,23 +286,19 @@
                 {
                     throw new Error("Id in Query or JSON with TitleId, ArtistId must be set!");
                 }
-                $result = array("successfull" => true);
+                $result = array("successful" => true);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
-                $this->strErrorDesc = empty($this->strErrorDesc) ? " Bad Request!" : "";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = empty($this->strErrorHeader) ? "HTTP/1.1 400 Bad Request" : "HTTP/1.1 405 Method Not Allowed";
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch(Exception $e)
             {
                 // catch errors caused by model
-                $this->strErrorDesc = " The JSON cannot be processed. Please check your Object!";
-                $this->strErrorDesc = $e->getMessage().$this->strErrorDesc;
-                $this->strErrorHeader = "HTTP/2.0 422 Unprocessable Entity";
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
-            $this->prepareOutput(array("errorCode" => $this->strErrorDesc, "errorHeader" => $this->strErrorHeader), $this->responseData);
+            $this->prepareOutput();
         }
-        // more Actions to come ...
     }
 ?>
