@@ -1,7 +1,7 @@
 <?php 
     interface IArtistTitle 
     {
-        // Achtung UNIQUE Index bei TitleCollection für TitelId und KünstlerId!!!
+        // Achtung UNIQUE Index bei TitleCollection für TitelId und KünstlerId!!! wird nicht mehr benötigt
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId);
         public function GetTitleCollectionIdByArtistNameAndTitleName(string $titleName, string $artistName);
         // ...

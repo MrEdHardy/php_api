@@ -23,7 +23,7 @@
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);
             $query = "UPDATE Künstler SET $querySets WHERE Id = $id";
-            return array("successfull" => $this->Update($query));
+            return array("successful" => $this->Update($query));
         }
 
         public function AddEntity(array $args)
@@ -100,7 +100,7 @@
 
         public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId)
         {
-            return array("successfull" => $this->Update("UPDATE Titelcollection SET TitelId = :TId, KünstlerId = :KId WHERE Id = :Id ", 
+            return array("successful" => $this->Update("UPDATE Titelcollection SET TitelId = :TId, KünstlerId = :KId WHERE Id = :Id ", 
             array(":TId" => $newTitleId, ":KId" => $newArtistId, ":Id" => $tcId)));
         }
 
