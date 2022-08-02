@@ -1,7 +1,8 @@
 <?php
     interface ITitle
     {
-        public function GetTitleByArticleId(int $id);
-        public function GetTitleByArticleName(string $name);
+        public function GetTitlesByArticleId(int $id);
+        public function GetTitlesByArticleName(string $name);
+        public function DeleteTitlesByName(string $name);
     }
 ?>
