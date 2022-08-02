@@ -57,32 +57,40 @@
 
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId)
         {
-
+            return $this->Select("SELECT tc.Id FROM Künstler as k
+            INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
+            INNER JOIN Titel t ON t.Id = tc.TitelId
+            WHERE k.Id = :KId AND t.Id = :TId", array(":KId" => $artistId, ":TId" => $titleId));
         }
 
         public function GetTitleCollectionIdByArtistNameAndTitleName(string $titleName, string $artistName)
         {
-
+            return $this->Select("SELECT tc.Id FROM Künstler as k
+            INNER JOIN Titelcollection tc ON tc.KünstlerId = k.Id
+            INNER JOIN Titel t ON t.Id = tc.TitelId
+            WHERE k.[Name] = :KName AND t.[Name] = :TName", array(":KName" => $artistName, ":TName" => $titleName));
         }
 
         public function AddNewTitleCollectionEntry(int $titleId, int $artistId)
         {
-
+            return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId)));
         }
 
         public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId)
         {
-
+            return array("successful" => $this->Update("UPDATE Titelcollection SET TitelId = :TId, KünstlerId = :KId WHERE Id = :Id ", 
+            array(":TId" => $newTitleId, ":KId" => $newArtistId, ":Id" => $tcId)));
         }
 
         public function DeleteTitleCollectionEntryById(int $id)
         {
-
+            return $this->Delete("DELETE FROM Titelcollection WHERE Id = :Id", array(":Id" => $id));
         }
 
         public function DeleteTitleCollectionEntryByArtistIdAndTitleId(int $titleId, int $artistId)
         {
-
+            return $this->Delete("DELETE TOP(1) FROM Titelcollection WHERE TitelId = :TId AND KünstlerId = :KId", 
+            array(":TId" => $titleId, ":KId" => $artistId));
         }
 
         public function GetTitlesByArticleId(int $id)
