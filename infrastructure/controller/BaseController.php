@@ -16,6 +16,7 @@ enum RequiredFieldTypes : int
     case IdAndJSON = 1024;
     case IdOrName = 2048;
     case IdOrJSON = 65536;
+    case customSimpleField = 16777216;
 }
 
 enum ControllerErrors : string
@@ -26,6 +27,7 @@ enum ControllerErrors : string
     case NoValidJSONAndId = "valid Id & JSON is required!";
     case NotAllowed = "Method Not Allowed!";
     case NoIdOrName = "Id or Name are required!";
+    case CustomFieldMissing = "%s is required!";
 }
 
 class BaseController
@@ -177,8 +179,9 @@ class BaseController
     /**
      * Checks all the necessary fields and throws an error if it's not set
      * @param RequiredFieldTypes $fields sets the requiredFields property in the BaseController
+     * @param string $customOptionalSimpleField the name of the to be checked field
      */
-    protected function checkParams(RequiredFieldTypes $fields)
+    protected function checkParams(RequiredFieldTypes $fields, string $customOptionalSimpleField = "")
     {
         $this->requiredFields = $fields;
         if($this->requiredFields === RequiredFieldTypes::Id)
@@ -219,6 +222,20 @@ class BaseController
             {
                 $this->strErrorHeader = HttpStatusCodesEnum::BadRequest->value;
                 throw new Error(ControllerErrors::NoIdOrName->value);
+            }
+        }
+        elseif($this->requiredFields === RequiredFieldTypes::customSimpleField)
+        {
+            if(empty($customOptionalSimpleField))
+            {
+                $this->strErrorHeader = HttpStatusCodesEnum::InternalServerError->value;
+                return new Error("Program Error: the to be checked field must be set!");
+            }
+
+            if(!isset($this->queryArgsArray["$customOptionalSimpleField"]))
+            {
+                $this->strErrorHeader = HttpStatusCodesEnum::BadRequest->value;
+                return new Error(sprintf(ControllerErrors::CustomFieldMissing->value, $customOptionalSimpleField));
             }
         }
     }
