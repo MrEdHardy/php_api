@@ -1,0 +1,292 @@
+USE [master]
+GO
+/****** Object:  Database [TestDB]    Script Date: 21.09.2022 12:42:37 ******/
+CREATE DATABASE [TestDB]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'TestDB', FILENAME = N'U:\MSSQL\DATA\TestDB.mdf' , SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+ LOG ON 
+( NAME = N'TestDB_LOG', FILENAME = N'U:\MSSQL\DATA\TestDB_log.ldf' , SIZE = 1536KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+GO
+ALTER DATABASE [TestDB] SET COMPATIBILITY_LEVEL = 120
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [TestDB].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [TestDB] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [TestDB] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [TestDB] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [TestDB] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [TestDB] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [TestDB] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [TestDB] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [TestDB] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [TestDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [TestDB] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [TestDB] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [TestDB] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [TestDB] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [TestDB] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [TestDB] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [TestDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [TestDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [TestDB] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [TestDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [TestDB] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [TestDB] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [TestDB] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [TestDB] SET RECOVERY SIMPLE 
+GO
+ALTER DATABASE [TestDB] SET  MULTI_USER 
+GO
+ALTER DATABASE [TestDB] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [TestDB] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [TestDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [TestDB] SET TARGET_RECOVERY_TIME = 0 SECONDS 
+GO
+ALTER DATABASE [TestDB] SET DELAYED_DURABILITY = DISABLED 
+GO
+USE [TestDB]
+GO
+/****** Object:  Table [dbo].[Künstler]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Künstler](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_Künstler] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[KünstlerCollection]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[KünstlerCollection](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[KünstlerId] [int] NOT NULL,
+	[MusikträgerId] [int] NOT NULL,
+ CONSTRAINT [PK_KünstlerCollection] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Lokation]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Lokation](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Regal] [int] NULL,
+	[Etage] [int] NULL,
+	[Stelle] [int] NULL,
+	[Active] [bit] NULL,
+ CONSTRAINT [PK_Lokation] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Medium]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Medium](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[B-Seite] [bit] NULL,
+	[LocationId] [int] NULL,
+ CONSTRAINT [PK_Medium] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Mediumcollection]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Mediumcollection](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Type] [nvarchar](50) NOT NULL,
+	[MusikträgerId] [int] NOT NULL,
+	[MediumId] [int] NOT NULL,
+	[TitelcollectionId] [int] NULL,
+ CONSTRAINT [PK_Mediumcollection] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [UIX_Mediumcollection_Type_MusikträgerId_MediumId_TitelcollectionId] UNIQUE NONCLUSTERED 
+(
+	[Type] ASC,
+	[MediumId] ASC,
+	[MusikträgerId] ASC,
+	[TitelcollectionId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Musikträger]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Musikträger](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NOT NULL,
+	[Genre] [nvarchar](50) NOT NULL,
+	[Kaufdatum] [date] NOT NULL,
+ CONSTRAINT [PK_Musikträger] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Titel]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Titel](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_Titel] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[Titelcollection]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Titelcollection](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[TitelId] [int] NOT NULL,
+	[KünstlerId] [int] NOT NULL,
+ CONSTRAINT [PK_Titelcollection] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+ALTER TABLE [dbo].[KünstlerCollection]  WITH CHECK ADD  CONSTRAINT [FK_KünstlerCollection_Künstler] FOREIGN KEY([KünstlerId])
+REFERENCES [dbo].[Künstler] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[KünstlerCollection] CHECK CONSTRAINT [FK_KünstlerCollection_Künstler]
+GO
+ALTER TABLE [dbo].[KünstlerCollection]  WITH CHECK ADD  CONSTRAINT [FK_KünstlerCollection_Musikträger] FOREIGN KEY([MusikträgerId])
+REFERENCES [dbo].[Musikträger] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[KünstlerCollection] CHECK CONSTRAINT [FK_KünstlerCollection_Musikträger]
+GO
+ALTER TABLE [dbo].[Medium]  WITH CHECK ADD  CONSTRAINT [FK_Medium_Lokation] FOREIGN KEY([LocationId])
+REFERENCES [dbo].[Lokation] ([Id])
+GO
+ALTER TABLE [dbo].[Medium] CHECK CONSTRAINT [FK_Medium_Lokation]
+GO
+ALTER TABLE [dbo].[Mediumcollection]  WITH CHECK ADD  CONSTRAINT [FK_Mediumcollection_Medium] FOREIGN KEY([MediumId])
+REFERENCES [dbo].[Medium] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Mediumcollection] CHECK CONSTRAINT [FK_Mediumcollection_Medium]
+GO
+ALTER TABLE [dbo].[Mediumcollection]  WITH CHECK ADD  CONSTRAINT [FK_Mediumcollection_Musikträger] FOREIGN KEY([MusikträgerId])
+REFERENCES [dbo].[Musikträger] ([Id])
+GO
+ALTER TABLE [dbo].[Mediumcollection] CHECK CONSTRAINT [FK_Mediumcollection_Musikträger]
+GO
+ALTER TABLE [dbo].[Mediumcollection]  WITH CHECK ADD  CONSTRAINT [FK_Mediumcollection_Titelcollection] FOREIGN KEY([TitelcollectionId])
+REFERENCES [dbo].[Titelcollection] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Mediumcollection] CHECK CONSTRAINT [FK_Mediumcollection_Titelcollection]
+GO
+ALTER TABLE [dbo].[Titelcollection]  WITH CHECK ADD  CONSTRAINT [FK_Titelcollection_Künstler] FOREIGN KEY([KünstlerId])
+REFERENCES [dbo].[Künstler] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Titelcollection] CHECK CONSTRAINT [FK_Titelcollection_Künstler]
+GO
+ALTER TABLE [dbo].[Titelcollection]  WITH CHECK ADD  CONSTRAINT [FK_Titelcollection_Titel] FOREIGN KEY([TitelId])
+REFERENCES [dbo].[Titel] ([Id])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Titelcollection] CHECK CONSTRAINT [FK_Titelcollection_Titel]
+GO
+--SELECT * FROM Künstler
+/****** Object:  Trigger [dbo].[testMCTriggerDelete]    Script Date: 21.09.2022 12:42:37 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TRIGGER [dbo].[testMCTriggerDelete]
+ON [dbo].[Mediumcollection]
+AFTER DELETE
+AS
+BEGIN
+	DECLARE @mtId AS INT, @medId AS INT, @tcId AS INT
+	SELECT @mtId = (SELECT TOP(1) MusikträgerId FROM deleted)
+	PRINT CONCAT('MusikträgerId: ', @mtId)
+	SELECT @medId = (SELECT TOP(1) MediumId FROM deleted)
+	PRINT CONCAT('MediumId: ', @medId)
+	SELECT @tcId = (SELECT TOP(1) TitelcollectionId FROM deleted)
+	PRINT CONCAT('TitelcollectionId: ', @tcId)
+
+	PRINT 'Lösche Musikträger'
+	DELETE FROM Musikträger WHERE Id = @mtId
+	PRINT 'Lösche Medium'
+	DELETE FROM [Medium] WHERE Id = @medId
+END
+
+GO
+USE [master]
+GO
+ALTER DATABASE [TestDB] SET  READ_WRITE 
+GO
