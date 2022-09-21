@@ -51,9 +51,23 @@
             return array("Id" => $this->Add($query));
         }
 
+        /**
+         * DML DELETE will go over Mediumcollection to delete a storage medium
+         */
         public function DeleteEntity(int $id)
         {
-            $this->Delete("DELETE FROM Musikträger WHERE Id = :Id", array(":Id" => $id));
+            // Check whether storage medium is used on atleast one Mediacollection
+            $subquery = $this->Select("SELECT COUNT(MusikträgerId) AS 'Count' FROM Mediumcollection WHERE MusikträgerId = :Id", array(":Id" => $id)); 
+            $count = $subquery[0]["Count"];
+
+            if($count > 0)
+            {
+                $this->Delete("DELETE FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE Id = :Id)", array(":Id" => $id));
+            }
+            else
+            {
+                $this->Delete("DELETE FROM Musikträger WHERE Id = :Id", array(":Id" => $id));
+            }
             return array("successful" => true);
         }
 
@@ -69,42 +83,61 @@
 
         public function GetStorageMediaByDate(array $args)
         {
+            if(!isset($args["Mode"]))
+                throw new Exception("Mode is not set!");
+            if(!isset($args["Dates"]))
+                throw new Exception("Date is not set!");
             $mode = $args["Mode"];
-            $dates = $args["Dates"];
             $operator = "";
-            if($mode !== DateModeEnum::Between->value)
+            if(DateModeEnum::tryFrom($mode) !== DateModeEnum::Between)
             {
-                if($mode === DateModeEnum::Equals->value)
-                    $operator = "=";
+                if(empty($args["Dates"][0]))
+                {
+                    $dates = $args["Dates"];
+                }
+                else
+                {
+                    $dates = $args["Dates"][0];
+                }
+
                 // return $this->Select($query, array(":date" => $dates));
-                
-                if($mode === DateModeEnum::Greater->value)
+                if(DateModeEnum::tryFrom($mode) === DateModeEnum::Equals)
+                {
+                    $operator = "=";
+                }
+                elseif(DateModeEnum::tryFrom($mode) === DateModeEnum::Greater)
+                {
                     $operator = ">";
-                
-                if($mode === DateModeEnum::Lesser->value)
+                }
+                elseif(DateModeEnum::tryFrom($mode) === DateModeEnum::Lesser)
+                {
                     $operator = "<";
-                
-                if($mode === DateModeEnum::GreaterOrEqual->value)
+                }
+                elseif(DateModeEnum::tryFrom($mode) === DateModeEnum::GreaterOrEqual)
+                {
                     $operator = ">=";
-                
-                if($mode === DateModeEnum::LesserOrEqual->value)
+                }
+                elseif(DateModeEnum::tryFrom($mode) === DateModeEnum::LesserOrEqual)
+                {
                     $operator = "<=";
-                
-                $query = "SELECT * FROM Musikträger WHERE [Date] $operator :date";
+                }
+                else 
+                {
+                    throw new Exception("Mode is invalid!");
+                }
+
+                $query = "SELECT * FROM Musikträger WHERE [Kaufdatum] $operator :date";
                 return $this->Select($query, array(":date" => $dates));
-            }
-            elseif($mode === DateModeEnum::Between)
-            {
-                if(count($dates) > 2)
-                    throw new Exception("Not more than two Dates can be used");
-                $date1 = $dates[0];
-                $date2 = $dates[1];
-                return $this->Select("SELECT * FROM Musikträger WHERE [Date] BETWEEN :date1 AND :date2", 
-                array(":date1" => $date1, ":date2" => $date2));
             }
             else
             {
-                throw new Exception("mode is invalid");
+                $dates = $args["Dates"];
+                if(count($dates) > 2)
+                    throw new Exception("Not more than two Dates can be used!");
+                $date1 = $dates[0];
+                $date2 = $dates[1];
+                return $this->Select("SELECT * FROM Musikträger WHERE [Kaufdatum] BETWEEN :date1 AND :date2", 
+                array(":date1" => $date1, ":date2" => $date2));
             }
         }
 
@@ -126,7 +159,19 @@
 
         public function DeleteStorageMediaByName(string $name)
         {
-            $this->Delete("DELETE TOP(1) FROM Musikträger WHERE [Name] = :name", array(":name" => $name));
+            // Check whether storage medium is used on atleast one Mediacollection
+            $subquery = $this->Select("SELECT COUNT(MusikträgerId) AS 'Count' FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE [Name] = :name)", array(":name" => $name)); 
+            $count = $subquery[0]["Count"];
+
+            if($count > 0)
+            {
+                $this->Delete("DELETE FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE Name = :name)", array(":name" => $name));
+            }
+            else
+            {
+                $this->Delete("DELETE FROM Musikträger WHERE [Name] = :name", array(":name" => $name));
+            }
+
             return array("successful" => true);
         }
 
@@ -165,7 +210,7 @@
 
         public function DeleteArtistCollectionEntryByArtistIdAndTitleId(int $smId, int $artistId)
         {
-            $this->Delete("DELETE TOP(1) FROM KünstlerCollection WHERE KünstlerId = :kId AND Musikträger = :smId", 
+            $this->Delete("DELETE FROM KünstlerCollection WHERE KünstlerId = :kId AND MusikträgerId = :smId", 
             array(":kId" => $artistId, ":smId" => $smId));
             return array("successful" => true);
         }

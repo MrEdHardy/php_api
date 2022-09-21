@@ -229,13 +229,13 @@ class BaseController
             if(empty($customOptionalSimpleField))
             {
                 $this->strErrorHeader = HttpStatusCodesEnum::InternalServerError->value;
-                return new Error("Program Error: the to be checked field must be set!");
+                throw new Error("Program Error: the to be checked field must be set!");
             }
 
-            if(!isset($this->queryArgsArray["$customOptionalSimpleField"]))
+            if(!isset($this->queryArgsArray[$customOptionalSimpleField]))
             {
                 $this->strErrorHeader = HttpStatusCodesEnum::BadRequest->value;
-                return new Error(sprintf(ControllerErrors::CustomFieldMissing->value, $customOptionalSimpleField));
+                throw new Error(sprintf(ControllerErrors::CustomFieldMissing->value, $customOptionalSimpleField));
             }
         }
     }

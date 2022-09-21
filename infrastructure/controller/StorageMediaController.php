@@ -38,7 +38,7 @@
             try 
             {
                 $this->validateServerMethod("GET");
-                $this->checkParams(RequiredFieldTypes::Id);
+                $this->checkParams(RequiredFieldTypes::IdAndJSON);
                 $result = $this->smModel->GetEntityById($this->queryArgsArray["Id"]);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
@@ -53,7 +53,7 @@
         }
 
         /**
-         * Endpoint ../locations/UpdateStorageMedia
+         * Endpoint ../storagemedia/UpdateStorageMedia
          */
         public function UpdateStorageMediaAction()
         {
@@ -75,7 +75,7 @@
         }
 
         /**
-         * Endpoint ../locations/AddStorageMedia
+         * Endpoint ../storagemedia/AddStorageMedia
          */
         public function AddStorageMediaAction()
         {
@@ -97,7 +97,7 @@
         }
 
         /**
-         * Endpoint ../locations/deleteStorageMedia
+         * Endpoint ../storagemedia/deleteStorageMedia
          */
         public function DeleteStorageMediaAction()
         {
@@ -127,7 +127,7 @@
         }
 
         /**
-         * Endpoint ../locations/GetStorageMediaByGenre
+         * Endpoint ../storagemedia/GetStorageMediaByGenre
          */
         public function GetStorageMediaByGenreAction()
         {
@@ -149,7 +149,7 @@
         }
 
         /**
-         * Endpoint ../locations/GetStorageMediaByDate
+         * Endpoint ../storagemedia/GetStorageMediaByDate
          */
         public function GetStorageMediaByDateAction()
         {
@@ -171,7 +171,7 @@
         }
 
          /**
-         * Endpoint ../locations/GetStorageMediaByArtist
+         * Endpoint ../storagemedia/GetStorageMediaByArtist
          */
         public function GetStorageMediaByArtistAction()
         {
@@ -185,7 +185,7 @@
                 }
                 else
                 {
-                    $result = $this->smModel->GetStorageMediaByArtistId($this->queryArgsArray["Name"]);
+                    $result = $this->smModel->GetStorageMediaByArtistName($this->queryArgsArray["Name"]);
                 }
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
@@ -199,6 +199,141 @@
             $this->prepareOutput();
         }
 
+        /**
+         * Endpoint ../storagemedia/getartistcollectionidsbyartistandstoragemedia
+         */
+        public function GetArtistCollectionIdsByArtistAndStoragemediaAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::JSON);
+                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $result = $this->smModel
+                    ->GetArtistCollectionIdByStorageMediaIdAndArtistId($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                }
+                elseif(isset($this->requestJsonBody["StorageMediaName"]) && isset($this->requestJsonBody["ArtistName"]))
+                {
+                    $result = $this->smModel
+                    ->GetArtistCollectionIdByStorageMediaNameAndArtistName($this->requestJsonBody["StorageMediaName"], $this->requestJsonBody["ArtistName"]);
+                }
+                else
+                {
+                    throw new Error("JSONs cannot have mixed Attributes!");
+                }
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                // catch errors caused by model
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
+            }
+            $this->prepareOutput();
+        }
 
+        /**
+         * Endpoint ../storagemedia/addnewArtistcollectionentry
+         */
+        public function AddNewArtistCollectionEntryAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("PUT");
+                $this->checkParams(RequiredFieldTypes::JSON);
+                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $result = $this->smModel
+                    ->AddNewArtistCollectionEntry($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                }
+                else
+                {
+                    throw new Error("JSON is invalid!");
+                }
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                // catch errors caused by model
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
+            }
+            $this->prepareOutput();
+        }
+
+         /**
+         * Endpoint ../storagemedia/updateartistcollectionentry
+         */
+        public function UpdateArtistCollectionEntryAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("POST");
+                $this->checkParams(RequiredFieldTypes::IdAndJSON);
+                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $result = $this->smModel
+                    ->UpdateArtistCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                }
+                else
+                {
+                    throw new Error("JSON is invalid!");
+                }
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                // catch errors caused by model
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
+            }
+            $this->prepareOutput();
+        }
+
+         /**
+         * Endpoint ../storagemedia/deleteartistcollectionentry
+         */
+        public function DeleteArtistCollectionEntryAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("DELETE");
+                $this->checkParams(RequiredFieldTypes::IdOrJSON);
+                if(isset($this->queryArgsArray["Id"]))
+                {
+                    $this->smModel->DeleteArtistCollectionEntryById($this->queryArgsArray["Id"]);
+                }
+                elseif(count($this->requestJsonBody) > 0 && isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                {
+                    $this->smModel->DeleteArtistCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                }
+                else
+                {
+                    throw new Error("Id in Query or JSON with StorageMediaId, ArtistId must be set!");
+                }
+                $result = array("successful" => true);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch Error caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
+            }
+            catch(Exception $e)
+            {
+                // catch errors caused by model
+                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
+            }
+            $this->prepareOutput();
+        }
     }
 ?>
