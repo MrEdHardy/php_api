@@ -38,7 +38,7 @@
             try 
             {
                 $this->validateServerMethod("GET");
-                $this->checkParams(RequiredFieldTypes::IdAndJSON);
+                $this->checkParams(RequiredFieldTypes::Id);
                 $result = $this->smModel->GetEntityById($this->queryArgsArray["Id"]);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
