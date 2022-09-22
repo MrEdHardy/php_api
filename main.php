@@ -35,6 +35,11 @@
             $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
+        case "mediumcollection":
+            $controller = new MediumCollectionController();
+            $actionToCall = $uri[3]."Action";
+            $controller->{$actionToCall}();
+            break;
         default:
             $objFeedController = new TestController();
             $strMethodName = $uri[3] . "Action";
