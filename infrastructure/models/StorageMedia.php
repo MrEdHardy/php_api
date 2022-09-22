@@ -56,18 +56,7 @@
          */
         public function DeleteEntity(int $id)
         {
-            // Check whether storage medium is used on atleast one Mediacollection
-            $subquery = $this->Select("SELECT COUNT(MusikträgerId) AS 'Count' FROM Mediumcollection WHERE MusikträgerId = :Id", array(":Id" => $id)); 
-            $count = $subquery[0]["Count"];
-
-            if($count > 0)
-            {
-                $this->Delete("DELETE FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE Id = :Id)", array(":Id" => $id));
-            }
-            else
-            {
-                $this->Delete("DELETE FROM Musikträger WHERE Id = :Id", array(":Id" => $id));
-            }
+            $this->Delete("DELETE FROM Musikträger WHERE Id = :Id", array(":Id" => $id));
             return array("successful" => true);
         }
 
@@ -159,19 +148,7 @@
 
         public function DeleteStorageMediaByName(string $name)
         {
-            // Check whether storage medium is used on atleast one Mediacollection
-            $subquery = $this->Select("SELECT COUNT(MusikträgerId) AS 'Count' FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE [Name] = :name)", array(":name" => $name)); 
-            $count = $subquery[0]["Count"];
-
-            if($count > 0)
-            {
-                $this->Delete("DELETE FROM Mediumcollection WHERE MusikträgerId IN (SELECT Id FROM Musikträger WHERE Name = :name)", array(":name" => $name));
-            }
-            else
-            {
-                $this->Delete("DELETE FROM Musikträger WHERE [Name] = :name", array(":name" => $name));
-            }
-
+            $this->Delete("DELETE FROM Musikträger WHERE [Name] = :name", array(":name" => $name));
             return array("successful" => true);
         }
 
