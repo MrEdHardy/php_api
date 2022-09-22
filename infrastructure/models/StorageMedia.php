@@ -9,7 +9,7 @@
         case Between = 16;
     }
 
-    class StorageMedia extends DataBase implements IEntity, IStorageMedia, IStorageMediaArtist
+    class StorageMedia extends DataBase implements IEntity, IStorageMedia, IStorageMediaArtist, IStorageMediaMediumCollection
     {
         public function GetAllEntities()
         {
@@ -190,6 +190,11 @@
             $this->Delete("DELETE FROM KünstlerCollection WHERE KünstlerId = :kId AND MusikträgerId = :smId", 
             array(":kId" => $artistId, ":smId" => $smId));
             return array("successful" => true);
+        }
+
+        public function GetStorageMediaByMediumCollectionId(int $id)
+        {
+            return $this->Select("SELECT * FROM Musikträger WHERE Id IN (SELECT MusikträgerId FROM Mediumcollection WHERE Id = :Id)", array(":Id" => $id));
         }
     }
 ?>

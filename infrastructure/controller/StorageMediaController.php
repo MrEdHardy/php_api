@@ -335,5 +335,27 @@
             }
             $this->prepareOutput();
         }
+
+        /**
+         * Endpoint ../storagemedia/GetStorageMediaByMediumCollectionId
+         */
+        public function GetStorageMediaByMediumCollectionIdAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::Id);
+                $result = $this->smModel->GetStorageMediaByMediumCollectionId($this->queryArgsArray["Id"]);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                $this->setErrorMsg($e->getMessage(), " Something went wrong!", HttpStatusCodesEnum::InternalServerError->value);
+            }
+
+            $this->prepareOutput();
+        }
     }
 ?>

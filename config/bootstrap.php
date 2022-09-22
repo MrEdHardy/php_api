@@ -9,6 +9,7 @@
     require_once "infrastructure/interfaces/IMedium.php";
     require_once "infrastructure/interfaces/IMediumMediumCollection.php";
     require_once "infrastructure/interfaces/IMediumCollection.php";
+    require_once "infrastructure/interfaces/IStorageMediaMediumCollection.php";
     require_once "infrastructure/models/Database.php";
     require_once "infrastructure/models/TestModel.php";
     require_once "infrastructure/models/Artist.php";
