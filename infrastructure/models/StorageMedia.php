@@ -80,7 +80,7 @@
             $operator = "";
             if(DateModeEnum::tryFrom($mode) !== DateModeEnum::Between)
             {
-                if(empty($args["Dates"][0]))
+                if(!is_array($args["Dates"]))
                 {
                     $dates = $args["Dates"];
                 }
@@ -120,6 +120,8 @@
             }
             else
             {
+                if(!is_array($args["Dates"]) || count($args["Dates"]) < 2)
+                    throw new Exception("Two Dates are required!");
                 $dates = $args["Dates"];
                 if(count($dates) > 2)
                     throw new Exception("Not more than two Dates can be used!");
