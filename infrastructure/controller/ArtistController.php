@@ -114,13 +114,12 @@
                 $this->checkParams(RequiredFieldTypes::IdOrName);
                 if(isset($this->queryArgsArray["Id"]))
                 {
-                    $this->artistModel->DeleteEntity($this->queryArgsArray["Id"]);
+                    $result = $this->artistModel->DeleteEntity($this->queryArgsArray["Id"]);
                 }
                 else 
                 {
-                    $this->artistModel->DeleteArtistByName($this->queryArgsArray["Name"]);    
+                    $result = $this->artistModel->DeleteArtistByName($this->queryArgsArray["Name"]);    
                 }
-                $result = array("successful" => true);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
@@ -210,15 +209,8 @@
             {
                 $this->validateServerMethod("PUT");
                 $this->checkParams(RequiredFieldTypes::JSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
-                {
-                    $result = $this->artistModel
-                    ->AddNewTitleCollectionEntry($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
-                }
-                else
-                {
-                    throw new Error("JSON is invalid!");
-                }
+                $result = $this->artistModel
+                    ->AddNewTitleCollectionEntry($this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
@@ -227,7 +219,7 @@
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $errorBody = " The JSON cannot be processed. Please check your Object!";
                 $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
             $this->prepareOutput();
@@ -242,15 +234,8 @@
             {
                 $this->validateServerMethod("POST");
                 $this->checkParams(RequiredFieldTypes::IdAndJSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
-                {
-                    $result = $this->artistModel
-                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
-                }
-                else
-                {
-                    throw new Error("JSON is invalid!");
-                }
+                $result = $this->artistModel
+                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller
@@ -259,7 +244,7 @@
             catch (Exception $e)
             {
                 // catch errors caused by model
-                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $errorBody = " The JSON cannot be processed. Please check your Object!";
                 $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
             $this->prepareOutput();
@@ -276,17 +261,16 @@
                 $this->checkParams(RequiredFieldTypes::IdOrJSON);
                 if(isset($this->queryArgsArray["Id"]))
                 {
-                    $this->artistModel->DeleteTitleCollectionEntryById($this->queryArgsArray["Id"]);
+                    $result = $this->artistModel->DeleteTitleCollectionEntryById($this->queryArgsArray["Id"]);
                 }
                 elseif(count($this->requestJsonBody) > 0 && isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
                 {
-                    $this->artistModel->DeleteTitleCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
+                    $result = $this->artistModel->DeleteTitleCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
                 }
                 else
                 {
                     throw new Error("Id in Query or JSON with TitleId, ArtistId must be set!");
                 }
-                $result = array("successful" => true);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 // catch Error caused by the controller

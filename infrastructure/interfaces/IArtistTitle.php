@@ -5,8 +5,8 @@
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId);
         public function GetTitleCollectionIdByArtistNameAndTitleName(string $titleName, string $artistName);
         // ...
-        public function AddNewTitleCollectionEntry(int $titleId, int $artistId);
-        public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId);
+        public function AddNewTitleCollectionEntry(array $args);
+        public function UpdateTitleCollectionEntry(int $tcId, array $args);
         public function DeleteTitleCollectionEntryById(int $id);
         public function DeleteTitleCollectionEntryByArtistIdAndTitleId(int $titleId, int $artistId);
     }

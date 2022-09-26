@@ -71,15 +71,29 @@
             WHERE k.[Name] = :KName AND t.[Name] = :TName", array(":KName" => $artistName, ":TName" => $titleName));
         }
 
-        public function AddNewTitleCollectionEntry(int $titleId, int $artistId)
+        public function AddNewTitleCollectionEntry(array $args)
         {
-            return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId)));
+            if(isset($args["TitleId"]) && isset($args["ArtistId"]))
+            {
+                return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $args["TitleId"], ":KId" => $args["ArtistId"])));
+            }
+            else
+            {
+                throw new Exception("JSON is invalid!");
+            }
         }
 
-        public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId)
+        public function UpdateTitleCollectionEntry(int $tcId, array $args)
         {
-            return array("successful" => $this->Update("UPDATE Titelcollection SET TitelId = :TId, KünstlerId = :KId WHERE Id = :Id ", 
-            array(":TId" => $newTitleId, ":KId" => $newArtistId, ":Id" => $tcId)));
+            if(isset($args["TitleId"]) && isset($args["ArtistId"]))
+            {
+                return array("successful" => $this->Update("UPDATE Titelcollection SET TitelId = :TId, KünstlerId = :KId WHERE Id = :Id ", 
+                array(":TId" => $args["TitleId"], ":KId" => $args["ArtistId"], ":Id" => $tcId)));
+            }
+            else
+            {
+                throw new Exception("JSON is invalid!");
+            }
         }
 
         public function DeleteTitleCollectionEntryById(int $id)

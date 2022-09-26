@@ -9,35 +9,30 @@
         exit();
     }
 
+    $actionToCall = $uri[3]."Action";
     switch ($uri[2]) {
         case "artists":
             $controller = new ArtistController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         case "titles":
             $controller = new TitleController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         case "locations":
             $controller = new LocationController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         case "storagemedia":
             $controller = new StorageMediaController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         case "media":
             $controller = new MediumController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         case "mediumcollection":
             $controller = new MediumCollectionController();
-            $actionToCall = $uri[3]."Action";
             $controller->{$actionToCall}();
             break;
         default:

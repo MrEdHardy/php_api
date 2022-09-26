@@ -170,22 +170,15 @@
             {
                 $this->validateServerMethod("PUT");
                 $this->checkParams(RequiredFieldTypes::JSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
-                {
-                    $result = $this->titleModel
-                    ->AddNewTitleCollectionEntry($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
-                }
-                else
-                {
-                    throw new Error("JSON is invalid!");
-                }
+                $result = $this->titleModel
+                    ->AddNewTitleCollectionEntry($this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch (Exception $e)
             {
-                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $errorBody = " The JSON cannot be processed. Please check your Object!";
                 $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
             $this->prepareOutput();
@@ -200,22 +193,15 @@
             {
                 $this->validateServerMethod("POST");
                 $this->checkParams(RequiredFieldTypes::IdAndJSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
-                {
-                    $result = $this->titleModel
-                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
-                }
-                else
-                {
-                    throw new Error("JSON is invalid!");
-                }
+                $result = $this->titleModel
+                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody);
                 $this->responseData = json_encode($result);
             } catch (Error $e) {
                 $this->setErrorMsg($e->getMessage(), "", empty($this->strErrorHeader) ? HttpStatusCodesEnum::BadRequest->value : $this->strErrorHeader);
             }
             catch (Exception $e)
             {
-                $errorBody = $e->getMessage()." The JSON cannot be processed. Please check your Object!";
+                $errorBody = " The JSON cannot be processed. Please check your Object!";
                 $this->setErrorMsg($e->getMessage(), $errorBody, HttpStatusCodesEnum::UnprocessableEntity->value);
             }
             $this->prepareOutput();
