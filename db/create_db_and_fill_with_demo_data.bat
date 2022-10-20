@@ -7,13 +7,13 @@ set usr=sa
 set pwd=AStrongSAPwd
 
 set connection_initial=-S %conn% -U %usr% -P %pwd% -d %db_initial%
-set connection=-S %conn% -U %usr% -P %pwd% -d %db%
+set connection=-S %conn% -U %usr% -P %pwd%
 
 echo Datenbank wird angelegt!
 echo.
 
 echo db_script.sql wird ausgeführt...
-"sqlcmd" %connection% -i "clean_db.sql"
+"sqlcmd" %connection% -i "db_script.sql"
 echo.
 
 echo Demodaten werden eingespielt!

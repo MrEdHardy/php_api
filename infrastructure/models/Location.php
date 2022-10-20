@@ -3,12 +3,26 @@
     {
         public function GetAllEntities()
         {
-            return $this->Select("SELECT * FROM Lokation ORDER BY Id ASC");
+            $result = $this->Select("SELECT * FROM Lokation ORDER BY Id ASC");
+            foreach ($result as $key => $value) 
+            {
+                $bool = json_decode($value["Active"]);
+                $value["Active"] = (boolean)$bool;
+                $result[$key] = $value;
+            }
+            return $result;
         }
 
         public function GetEntityById(int $id)
         {
-            return $this->Select("SELECT * FROM Lokation WHERE Id = :Id", array(":Id" => $id));
+            $result = $this->Select("SELECT * FROM Lokation WHERE Id = :Id", array(":Id" => $id));
+            foreach ($result as $key => $value) 
+            {
+                $bool = json_decode($value["Active"]);
+                $value["Active"] = (boolean)$bool;
+                $result[$key] = $value;
+            }
+            return $result;
         }
 
         public function AddEntity(array $args)
@@ -19,15 +33,19 @@
                 throw new Exception("JSON is empty!");
             foreach ($args as $key => $value) 
             {
-                $queryColumns .= "$key,";
-                $queryValues .= "'$value',";
+                if(strcasecmp($key, "Id") != 0)
+                {
+                    $queryColumns .= "$key,";
+                    $queryValues .= "'$value',";
+                }
             }
             $queryColumns[strlen($queryColumns) - 1] = " ";
             $queryValues[strlen($queryValues) - 1] = " ";
             $queryColumns = trim($queryColumns);
             $queryValues = trim($queryValues);
             $query = "INSERT INTO Lokation($queryColumns) VALUES($queryValues)";
-            return array("Id" => $this->Add($query));
+            $mergedObject = array_merge($args, array("Id" => $this->Add($query)));
+            return $mergedObject;
         }
 
         public function UpdateEntity(int $id, array $args)
@@ -37,7 +55,8 @@
                 throw new Exception("JSON is empty!");
             foreach ($args as $key => $value) 
             {
-                $querySets .= "$key='$value',";
+                if(strcasecmp($key, "Id") != 0)
+                    $querySets .= "$key='$value',";
             }
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);

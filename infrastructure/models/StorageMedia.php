@@ -26,7 +26,8 @@
             $querySets = "";
             foreach ($args as $key => $value) 
             {
-                $querySets .= "$key='$value',";
+                if(strcasecmp($key, "Id") != 0)
+                    $querySets .= "$key='$value',";
             }
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);
@@ -40,15 +41,19 @@
             $queryValues = "";
             foreach ($args as $key => $value) 
             {
-                $queryColumns .= "$key,";
-                $queryValues .= "'$value',";
+                if(strcasecmp($key, "Id") != 0)
+                {
+                    $queryColumns .= "$key,";
+                    $queryValues .= "'$value',";
+                }
             }
             $queryColumns[strlen($queryColumns) - 1] = " ";
             $queryValues[strlen($queryValues) - 1] = " ";
             $queryColumns = trim($queryColumns);
             $queryValues = trim($queryValues);
             $query = "INSERT INTO Musikträger($queryColumns) VALUES($queryValues)";
-            return array("Id" => $this->Add($query));
+            $mergedObject = array_merge($args, array("Id" => $this->Add($query)));
+            return $mergedObject;
         }
 
         /**
@@ -154,6 +159,16 @@
             return array("successful" => true);
         }
 
+        public function GetAllArtistCollections()
+        {
+            return $this->Select("SELECT * FROM [KünstlerCollection] ORDER BY Id ASC");
+        }
+
+        public function GetArtistCollectionById(int $id)
+        {
+            return $this->Select("SELECT * FROM [KünstlerCollection] WHERE Id = :Id", array(":Id" => $id));
+        }
+
         public function GetArtistCollectionIdByStorageMediaIdAndArtistId(int $smId, int $aid)
         {
             return $this->Select("SELECT kc.Id FROM Musikträger mt
@@ -172,7 +187,9 @@
 
         public function AddNewArtistCollectionEntry(int $smId, int $aId)
         {
-            return array("Id" => $this->Add("INSERT INTO KünstlerCollection VALUES(:kId, :smId)", array(":kId" => $aId, ":smId" => $smId)));
+            $args = array("KünstlerId" => "$aId", "MusikträgerId" => "$smId");
+            $mergedObject = array_merge($args, array("Id" => $this->Add("INSERT INTO KünstlerCollection VALUES(:kId, :smId)", array(":kId" => $aId, ":smId" => $smId))));
+            return $mergedObject;
         }
 
         public function UpdateArtistCollectionEntry(int $acId, int $newSmId, int $newArtistId)

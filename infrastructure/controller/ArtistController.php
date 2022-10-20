@@ -165,6 +165,53 @@
         }
 
         /**
+         * Endpoint ../artists/GetAllTitleCollections
+         */
+        public function GetAllTitleCollectionsAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("GET");
+                // Execute Query
+                $result = $this->artistModel->GetAllTitleCollections();
+                // Encode Result to JSON
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                $this->setErrorMsg($e->getMessage(), "Something went wrong", HttpStatusCodesEnum::InternalServerError->value);
+            }
+
+            // sends either an error or a result back to the user
+            $this->prepareOutput();
+        }
+
+        /**
+         * Endpoint ../artists/GetTitleCollectionById
+         */
+        public function GetTitleCollectionByIdAction()
+        {            
+            try 
+            {
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::Id);
+                $result = $this->artistModel->GetTitleCollectionById($this->queryArgsArray["Id"]);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                // catch errors caused by the controller
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            } 
+            catch (Exception $e) 
+            {
+                $this->setErrorMsg($e->getMessage(), " Something went wrong!", HttpStatusCodesEnum::InternalServerError->value);
+            }
+
+            $this->prepareOutput();
+        }
+
+        /**
          * Endpoint ../artists/gettitlecollectionIdsbyartistandtitle
          */
         public function GetTitleCollectionIdsByArtistAndTitleAction()
@@ -173,7 +220,7 @@
             {
                 $this->validateServerMethod("GET");
                 $this->checkParams(RequiredFieldTypes::JSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
+                if((isset($this->requestJsonBody["TitleId"]) || isset($this->requestJsonBody["TitelId"])) && (isset($this->requestJsonBody["ArtistId"]) || isset($this->requestJsonBody["KünstlerId"])))
                 {
                     $result = $this->artistModel
                     ->GetTitleCollectionIdByArtistIdAndTitleId($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
@@ -215,6 +262,11 @@
                     $result = $this->artistModel
                     ->AddNewTitleCollectionEntry($this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
                 }
+                elseif(isset($this->requestJsonBody["TitelId"]) && isset($this->requestJsonBody["KünstlerId"]))
+                {
+                    $result = $this->artistModel
+                    ->AddNewTitleCollectionEntry($this->requestJsonBody["TitelId"], $this->requestJsonBody["KünstlerId"]);
+                }
                 else
                 {
                     throw new Error("JSON is invalid!");
@@ -242,10 +294,10 @@
             {
                 $this->validateServerMethod("POST");
                 $this->checkParams(RequiredFieldTypes::IdAndJSON);
-                if(isset($this->requestJsonBody["TitleId"]) && isset($this->requestJsonBody["ArtistId"]))
+                if(isset($this->requestJsonBody["TitelId"]) && isset($this->requestJsonBody["KünstlerId"]))
                 {
                     $result = $this->artistModel
-                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["TitleId"], $this->requestJsonBody["ArtistId"]);
+                    ->UpdateTitleCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["TitelId"], $this->requestJsonBody["KünstlerId"]);
                 }
                 else
                 {

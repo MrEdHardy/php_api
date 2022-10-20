@@ -200,6 +200,49 @@
         }
 
         /**
+         * Endpoint ../storagemedia/GetAllArtistCollections
+         */
+        public function GetAllArtistCollectionsAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("GET");
+                $result = $this->smModel->GetAllArtistCollections();
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                $this->setErrorMsg($e->getMessage(), " Something went wrong!", HttpStatusCodesEnum::InternalServerError->value);
+            }
+
+            $this->prepareOutput();
+        }
+
+        /**
+         * Endpoint ../storagemedia/GetArtistCollectionById
+         */
+        public function GetArtistCollectionByIdAction()
+        {
+            try 
+            {
+                $this->validateServerMethod("GET");
+                $this->checkParams(RequiredFieldTypes::Id);
+                $result = $this->smModel->GetArtistCollectionById($this->queryArgsArray["Id"]);
+                $this->responseData = json_encode($result);
+            } catch (Error $e) {
+                $this->setErrorMsg($e->getMessage(), "", $this->strErrorHeader);
+            }
+            catch (Exception $e)
+            {
+                $this->setErrorMsg($e->getMessage(), " Something went wrong!", HttpStatusCodesEnum::InternalServerError->value);
+            }
+
+            $this->prepareOutput();
+        }
+
+        /**
          * Endpoint ../storagemedia/getartistcollectionidsbyartistandstoragemedia
          */
         public function GetArtistCollectionIdsByArtistAndStoragemediaAction()
@@ -208,10 +251,10 @@
             {
                 $this->validateServerMethod("GET");
                 $this->checkParams(RequiredFieldTypes::JSON);
-                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                if(isset($this->requestJsonBody["MusikträgerId"]) && isset($this->requestJsonBody["KünstlerId"]))
                 {
                     $result = $this->smModel
-                    ->GetArtistCollectionIdByStorageMediaIdAndArtistId($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                    ->GetArtistCollectionIdByStorageMediaIdAndArtistId($this->requestJsonBody["MusikträgerId"], $this->requestJsonBody["KünstlerId"]);
                 }
                 elseif(isset($this->requestJsonBody["StorageMediaName"]) && isset($this->requestJsonBody["ArtistName"]))
                 {
@@ -245,10 +288,10 @@
             {
                 $this->validateServerMethod("PUT");
                 $this->checkParams(RequiredFieldTypes::JSON);
-                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                if(isset($this->requestJsonBody["MusikträgerId"]) && isset($this->requestJsonBody["KünstlerId"]))
                 {
                     $result = $this->smModel
-                    ->AddNewArtistCollectionEntry($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                    ->AddNewArtistCollectionEntry($this->requestJsonBody["MusikträgerId"], $this->requestJsonBody["KünstlerId"]);
                 }
                 else
                 {
@@ -277,10 +320,10 @@
             {
                 $this->validateServerMethod("POST");
                 $this->checkParams(RequiredFieldTypes::IdAndJSON);
-                if(isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                if(isset($this->requestJsonBody["MusikträgerId"]) && isset($this->requestJsonBody["KünstlerId"]))
                 {
                     $result = $this->smModel
-                    ->UpdateArtistCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                    ->UpdateArtistCollectionEntry($this->queryArgsArray["Id"], $this->requestJsonBody["MusikträgerId"], $this->requestJsonBody["KünstlerId"]);
                 }
                 else
                 {
@@ -313,9 +356,9 @@
                 {
                     $this->smModel->DeleteArtistCollectionEntryById($this->queryArgsArray["Id"]);
                 }
-                elseif(count($this->requestJsonBody) > 0 && isset($this->requestJsonBody["StorageMediaId"]) && isset($this->requestJsonBody["ArtistId"]))
+                elseif(count($this->requestJsonBody) > 0 && isset($this->requestJsonBody["MusikträgerId"]) && isset($this->requestJsonBody["KünstlerId"]))
                 {
-                    $this->smModel->DeleteArtistCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["StorageMediaId"], $this->requestJsonBody["ArtistId"]);
+                    $this->smModel->DeleteArtistCollectionEntryByArtistIdAndTitleId($this->requestJsonBody["MusikträgerId"], $this->requestJsonBody["KünstlerId"]);
                 }
                 else
                 {

@@ -18,7 +18,8 @@
                 throw new Exception("JSON is empty!");
             foreach ($args as $key => $value) 
             {
-                $querySets .= "$key='$value',";
+                if(strcasecmp($key, "Id") != 0)
+                    $querySets .= "$key='$value',";
             }
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);
@@ -34,16 +35,19 @@
                 throw new Exception("JSON is empty!");
             foreach ($args as $key => $value) 
             {
-                $queryColumns .= "$key,";
-                $queryValues .= "'$value',";
+                if(strcasecmp($key, "Id") != 0)
+                {
+                    $queryColumns .= "$key,";
+                    $queryValues .= "'$value',";
+                }
             }
             $queryColumns[strlen($queryColumns) - 1] = " ";
             $queryValues[strlen($queryValues) - 1] = " ";
             $queryColumns = trim($queryColumns);
             $queryValues = trim($queryValues);
             $query = "INSERT INTO Künstler($queryColumns) VALUES($queryValues)";
-            // return $this->Add($query, array(":Col" => "Künstler"));
-            return array("Id" => $this->Add($query));
+            $mergedObject = array_merge($args, array("Id" => $this->Add($query)));
+            return $mergedObject;
         }
 
         public function DeleteEntity(int $id)
@@ -76,6 +80,16 @@
             INNER JOIN Titel t ON t.Id = tc.TitelId
             WHERE t.Name = :Name", array(":Name" => $name));
         }
+
+        public function GetAllTitleCollections()
+        {
+            return $this->Select("SELECT * FROM Titelcollection ORDER BY Id ASC");
+        }
+
+        public function GetTitleCollectionById(int $id)
+        {
+            return $this->Select("SELECT * FROM Titelcollection WHERE Id = :Id", array(":Id" => $id));
+        }
         
         public function GetTitleCollectionIdByArtistIdAndTitleId(int $titleId, int $artistId)
         {
@@ -95,7 +109,10 @@
 
         public function AddNewTitleCollectionEntry(int $titleId, int $artistId)
         {
-            return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId)));
+            $args = array("TitelId" => "$titleId", "KünstlerId" => "$artistId");
+            $mergedObject = array_merge($args, array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId))));
+            // return array("Id" => $this->Add("INSERT INTO Titelcollection VALUES(:TId, :KId)", array(":TId" => $titleId, ":KId" => $artistId)));
+            return $mergedObject;
         }
 
         public function UpdateTitleCollectionEntry(int $tcId, int $newTitleId, int $newArtistId)

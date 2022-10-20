@@ -16,7 +16,8 @@
             $querySets = "";
             foreach ($args as $key => $value) 
             {
-                $querySets .= "$key='$value',";
+                if(strcasecmp($key, "Id") != 0)
+                    $querySets .= "$key='$value',";
             }
             $querySets[strlen($querySets) - 1] = " ";
             $querySets = trim($querySets);
@@ -30,15 +31,19 @@
             $queryValues = "";
             foreach ($args as $key => $value) 
             {
-                $queryColumns .= "$key,";
-                $queryValues .= "'$value',";
+                if(strcasecmp($key, "Id") != 0)
+                {
+                    $queryColumns .= "$key,";
+                    $queryValues .= "'$value',";
+                }
             }
             $queryColumns[strlen($queryColumns) - 1] = " ";
             $queryValues[strlen($queryValues) - 1] = " ";
             $queryColumns = trim($queryColumns);
             $queryValues = trim($queryValues);
             $query = "INSERT INTO Mediumcollection($queryColumns) VALUES($queryValues)";
-            return array("Id" => $this->Add($query));
+            $mergedObject = array_merge($args, array("Id" => $this->Add($query)));
+            return $mergedObject;
         }
 
         public function DeleteEntity(int $id)
