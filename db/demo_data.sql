@@ -1,4 +1,6 @@
-﻿INSERT INTO Titel VALUES('TestTitel')
+﻿USE [PHP_API]
+GO
+INSERT INTO Titel VALUES('TestTitel')
 INSERT INTO Titel VALUES('TestTitel1')
 INSERT INTO [Künstler] VALUES('TestKünstler')
 INSERT INTO [Künstler] VALUES('TestKünstler1')
